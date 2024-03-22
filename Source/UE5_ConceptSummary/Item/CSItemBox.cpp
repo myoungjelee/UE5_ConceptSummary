@@ -7,6 +7,9 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Physics/CSCollision.h"
 #include "Interface/CSCharacterItemInterface.h"
+#include "Engine/AssetManager.h"
+#include "Item/CSItemData.h"
+
 // Sets default values
 ACSItemBox::ACSItemBox()
 {
@@ -39,6 +42,26 @@ ACSItemBox::ACSItemBox()
 			Effect->SetTemplate(EffectRef.Object);
 			Effect->bAutoActivate = false;
 		}
+}
+
+void ACSItemBox::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UAssetManager& Manager = UAssetManager::Get();
+
+	TArray<FPrimaryAssetId> Assets;
+	Manager.GetPrimaryAssetIdList(TEXT("CSItemData"), Assets);
+	ensure(0 < Assets.Num());
+
+	int32 RandIdx = FMath::RandRange(0, Assets.Num() - 1);
+	FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandIdx]));
+	if (AssetPtr.IsPending())
+	{
+		AssetPtr.LoadSynchronous();
+	}
+	Item = Cast<UCSItemData>(AssetPtr.Get());
+	ensure(Item);
 }
 
 void ACSItemBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)

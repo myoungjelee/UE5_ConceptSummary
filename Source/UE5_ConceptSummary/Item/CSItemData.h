@@ -25,4 +25,9 @@ class UE5_CONCEPTSUMMARY_API UCSItemData : public UPrimaryDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
 	EItemType Type;
+
+	FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("CSItemData", GetFName());
+	}
 };

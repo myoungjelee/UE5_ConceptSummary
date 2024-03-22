@@ -12,6 +12,9 @@
 #include "CharacterStat/CSCharacterStatComponent.h"
 #include "UI/CSWidgetComponent.h"
 #include "UI/CSHpBarWidget.h"
+#include "Item/CSWeaponItemData.h"
+
+DEFINE_LOG_CATEGORY(LogCSCharacter);
 
 // Sets default values
 ACSCharacterBase::ACSCharacterBase()
@@ -23,7 +26,7 @@ ACSCharacterBase::ACSCharacterBase()
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_ABCAPSULE);
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_CSCAPSULE);
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -96,6 +99,15 @@ ACSCharacterBase::ACSCharacterBase()
 		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	// Item Actions (CSItemData에있는 Enum 순서대로 추가해줘야함)
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &ACSCharacterBase::EquipWeapon)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &ACSCharacterBase::DrinkPotion)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &ACSCharacterBase::ReadScroll)));
+
+	// Weapon Component
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void ACSCharacterBase::PostInitializeComponents()
@@ -201,7 +213,7 @@ void ACSCharacterBase::AttackHitCheck()
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_ABACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_CSACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 	if (HitDetected)
 	{
 		FDamageEvent DamageEvent;
@@ -252,6 +264,43 @@ void ACSCharacterBase::SetupCharacterWidget(UCSUserWidget* InUserWidget)
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UCSHpBarWidget::UpdateHpBar);
 	}
+}
+
+void ACSCharacterBase::TakeItem(UCSItemData* InItemData)
+{
+	if (InItemData)
+	{
+		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+	}
+}
+
+void ACSCharacterBase::DrinkPotion(UCSItemData* InItemData)
+{
+	UE_LOG(LogCSCharacter, Log, TEXT("Drink Potion"));
+}
+
+void ACSCharacterBase::EquipWeapon(UCSItemData* InItemData)
+{
+	UE_LOG(LogCSCharacter, Log, TEXT("Equip Weapon"));
+	UCSWeaponItemData* WeaponItemData = Cast<UCSWeaponItemData>(InItemData);
+
+	if (WeaponItemData)
+	{
+		//// Hard Ref
+		//Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh);
+
+		// Soft Ref
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+	}
+}
+
+void ACSCharacterBase::ReadScroll(UCSItemData* InItemData)
+{
+	UE_LOG(LogCSCharacter, Log, TEXT("Read Scroll"));
 }
 
 

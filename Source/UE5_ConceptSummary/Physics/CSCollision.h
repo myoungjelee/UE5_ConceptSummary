@@ -3,6 +3,6 @@
 
 #include "CoreMinimal.h"
 
-#define CPROFILE_ABCAPSULE TEXT("ABCapsule")
-#define CPROFILE_ABTRIGGER TEXT("ABTrigger")
-#define CCHANNEL_ABACTION ECC_GameTraceChannel1
+#define CPROFILE_CSCAPSULE TEXT("CSCapsule")
+#define CPROFILE_CSTRIGGER TEXT("CSTrigger")
+#define CCHANNEL_CSACTION ECC_GameTraceChannel1

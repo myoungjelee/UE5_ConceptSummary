@@ -3,10 +3,14 @@
 
 #include "Character/CSCharacterNonPlayer.h"
 #include "Engine/AssetManager.h"
+#include "Ai/CSAIController.h"
 
 ACSCharacterNonPlayer::ACSCharacterNonPlayer()
 {
 	GetMesh()->SetHiddenInGame(true);
+
+	AIControllerClass = ACSAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ACSCharacterNonPlayer::PostInitializeComponents()

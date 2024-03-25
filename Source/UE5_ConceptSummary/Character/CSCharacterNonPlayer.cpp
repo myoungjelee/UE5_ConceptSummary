@@ -4,6 +4,7 @@
 #include "Character/CSCharacterNonPlayer.h"
 #include "Engine/AssetManager.h"
 #include "Ai/CSAIController.h"
+#include "CharacterStat/CSCharacterStatComponent.h"
 
 ACSCharacterNonPlayer::ACSCharacterNonPlayer()
 {
@@ -48,4 +49,41 @@ void ACSCharacterNonPlayer::NPCMeshLoadCompleted()
 	}
 
 	NPCMeshHandle->ReleaseHandle();
+}
+
+float ACSCharacterNonPlayer::GetAIPatrolRadius()
+{
+	return 800.0f;
+}
+
+float ACSCharacterNonPlayer::GetAIDetectRange()
+{
+	return 400.0f;
+}
+
+float ACSCharacterNonPlayer::GetAIAttackRange()
+{
+	return Stat->GetTotalStat().AttackRange + Stat->GetAttackRadius() * 2;
+}
+
+float ACSCharacterNonPlayer::GetAITurnSpeed()
+{
+	return 2.0f;
+}
+
+void ACSCharacterNonPlayer::AttackByAI()
+{
+	ProcessComboCommand();
+}
+
+void ACSCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void ACSCharacterNonPlayer::NotifyComboActionEnd()
+{
+	Super::NotifyComboActionEnd();
+
+	OnAttackFinished.ExecuteIfBound();
 }

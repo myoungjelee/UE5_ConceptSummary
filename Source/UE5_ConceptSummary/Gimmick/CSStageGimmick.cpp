@@ -70,6 +70,9 @@ ACSStageGimmick::ACSStageGimmick()
 		FVector BoxLoc = Stage->GetSocketLocation(GateSocket) / 2;
 		RewardBoxLocs.Add(GateSocket, BoxLoc);
 	}
+
+	// Stage Stat
+	CurrentStageNum = 0;
 }
 
 void ACSStageGimmick::OnConstruction(const FTransform& Transform)
@@ -98,7 +101,13 @@ void ACSStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 
 	if (!bResult)
 	{
-		GetWorld()->SpawnActor<ACSStageGimmick>(NewLoc, FRotator::ZeroRotator);
+		FTransform NewTransform(NewLoc);
+		ACSStageGimmick* NewGimmick = GetWorld()->SpawnActorDeferred<ACSStageGimmick>(ACSStageGimmick::StaticClass(), NewTransform);
+		if (NewGimmick != nullptr)
+		{
+			NewGimmick->SetStageNum(CurrentStageNum + 1);
+			NewGimmick->FinishSpawning(NewTransform);
+		}
 	}
 }
 
@@ -182,11 +191,15 @@ void ACSStageGimmick::OnEnemyDestroyed(AActor* DestroyedActor)
 
 void ACSStageGimmick::OnEnemySpawn()
 {
-	const FVector SpawnLoc = GetActorLocation() + FVector::UpVector * 88.0f;
-	ACSCharacterNonPlayer* CSEnemy = GetWorld()->SpawnActor<ACSCharacterNonPlayer>(EnemyClass, SpawnLoc, FRotator::ZeroRotator);
+	/*const FVector SpawnLoc = GetActorLocation() + FVector::UpVector * 88.0f;
+	ACSCharacterNonPlayer* CSEnemy = GetWorld()->SpawnActor<ACSCharacterNonPlayer>(EnemyClass, SpawnLoc, FRotator::ZeroRotator);*/
+	const FTransform SpawnTransform(GetActorLocation() + FVector::UpVector * 88.0f);
+	ACSCharacterNonPlayer* CSEnemy = GetWorld()->SpawnActorDeferred<ACSCharacterNonPlayer>(EnemyClass, SpawnTransform);    //SpawnActorDeferred 지연생성 
 	if (CSEnemy)
 	{
 		CSEnemy->OnDestroyed.AddDynamic(this, &ACSStageGimmick::OnEnemyDestroyed);
+		CSEnemy->SetLevel(CurrentStageNum);
+		CSEnemy->FinishSpawning(SpawnTransform);   // 지연생성 후 FinishSpawning 이것을 해주고 나서야 캐릭터가 소유하고 있는 스탯컴포넌트의 비긴플레이가 실행됨
 	}
 }
 
@@ -212,13 +225,23 @@ void ACSStageGimmick::SpawnRewardBoxes()
 {
 	for (const auto& RewardBoxLoc : RewardBoxLocs)
 	{
-		FVector WorldSpawnLoc = GetActorLocation() + RewardBoxLoc.Value + FVector(0.0f, 0.0f, 30.0f);
-		ACSItemBox* RewardBoxActor = GetWorld()->SpawnActor<ACSItemBox>(RewardBoxClass, WorldSpawnLoc, FRotator::ZeroRotator);
+		/*FVector WorldSpawnLoc = GetActorLocation() + RewardBoxLoc.Value + FVector(0.0f, 0.0f, 30.0f);
+		ACSItemBox* RewardBoxActor = GetWorld()->SpawnActor<ACSItemBox>(RewardBoxClass, WorldSpawnLoc, FRotator::ZeroRotator);*/
+		FTransform SpawnTransform(GetActorLocation() + RewardBoxLoc.Value + FVector(0.0f, 0.0f, 30.0f));
+		ACSItemBox* RewardBoxActor = GetWorld()->SpawnActorDeferred<ACSItemBox>(RewardBoxClass, SpawnTransform);
 		if (RewardBoxActor)
 		{
 			RewardBoxActor->Tags.Add(RewardBoxLoc.Key);
 			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &ACSStageGimmick::OnRewardTrggerBeginOverlap);
 			RewardBoxes.Add(RewardBoxActor);
+		}
+	}
+
+	for (const auto& RewardBox : RewardBoxes)
+	{
+		if (RewardBox.IsValid())
+		{
+			RewardBox.Get()->FinishSpawning(RewardBox.Get()->GetActorTransform());
 		}
 	}
 }

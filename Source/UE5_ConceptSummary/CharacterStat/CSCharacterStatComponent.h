@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameData/CSCharacterStat.h"
 #include "CSCharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
@@ -26,17 +27,26 @@ public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
 
-	FORCEINLINE float GetMaxHp() { return MaxHp; }
-	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
+	void SetLevelStat(int32 InNewLevel);
+	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
+	FORCEINLINE void SetModifierStat(const FCSCharacterStat& InModifierStat) { ModifierStat = InModifierStat; }
+	FORCEINLINE FCSCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
 	float ApplyDamage(float InDamage);
 
 protected:
 	void SetHp(float NewHp);
 
-	UPROPERTY(VisibleInstanceOnly, Category = Stat)
-	float MaxHp;
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)  // Transient = 게임 실행 중에만 유효하고, 게임 저장 또는 로딩 과정에서 제외
+	float CurrentHp;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
-	float CurrentHp;
+	float CurrentLevel;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	FCSCharacterStat BaseStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	FCSCharacterStat ModifierStat;
 		
 };

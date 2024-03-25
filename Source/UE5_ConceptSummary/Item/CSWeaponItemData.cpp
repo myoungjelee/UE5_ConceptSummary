@@ -3,3 +3,10 @@
 
 #include "Item/CSWeaponItemData.h"
 
+
+FPrimaryAssetId UCSWeaponItemData::GetPrimaryAssetId() const
+{
+    Super::GetPrimaryAssetId();
+
+    return FPrimaryAssetId("CSItemData", GetFName());
+}

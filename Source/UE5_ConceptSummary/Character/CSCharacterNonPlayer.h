@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Character/CSCharacterBase.h"
+#include "Engine/StreamableManager.h"
 #include "CSCharacterNonPlayer.generated.h"
 
 /**
  * 
  */
-UCLASS()
+UCLASS(config=ConceptSummary)
 class UE5_CONCEPTSUMMARY_API ACSCharacterNonPlayer : public ACSCharacterBase
 {
 	GENERATED_BODY()
@@ -17,7 +18,13 @@ class UE5_CONCEPTSUMMARY_API ACSCharacterNonPlayer : public ACSCharacterBase
 public:
 	ACSCharacterNonPlayer();
 
+	virtual void PostInitializeComponents() override;
 protected:
 	void SetDead() override;
+	void NPCMeshLoadCompleted();
 	
+	UPROPERTY(config)
+	TArray<FSoftObjectPath> NPCMeshes;
+
+	TSharedPtr<FStreamableHandle> NPCMeshHandle;
 };

@@ -2,12 +2,12 @@
 
 
 #include "CharacterStat/CSCharacterStatComponent.h"
+#include "GameData/CSGameSingleton.h"
 
 // Sets default values for this component's properties
 UCSCharacterStatComponent::UCSCharacterStatComponent()
 {
-	MaxHp = 200.0f;
-	CurrentHp = MaxHp;
+	CurrentLevel = 1;
 }
 
 
@@ -16,7 +16,15 @@ void UCSCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetHp(MaxHp);	
+	SetLevelStat(CurrentLevel);
+	SetHp(BaseStat.MaxHp);
+}
+
+void UCSCharacterStatComponent::SetLevelStat(int32 InNewLevel)
+{
+	CurrentLevel = FMath::Clamp(InNewLevel, 1, UCSGameSingleton::Get().CharacterMaxLevel);
+	BaseStat = UCSGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	check(BaseStat.MaxHp > 0.0f);
 }
 
 float UCSCharacterStatComponent::ApplyDamage(float InDamage)
@@ -35,7 +43,7 @@ float UCSCharacterStatComponent::ApplyDamage(float InDamage)
 
 void UCSCharacterStatComponent::SetHp(float NewHp)
 {
-	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, MaxHp);
+	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, BaseStat.MaxHp);
 	
 	OnHpChanged.Broadcast(CurrentHp);
 }

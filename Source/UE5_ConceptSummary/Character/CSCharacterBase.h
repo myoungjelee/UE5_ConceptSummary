@@ -105,4 +105,9 @@ protected:
 	virtual void EquipWeapon(class UCSItemData* InItemData);
 	virtual void ReadScroll(class UCSItemData* InItemData);
 
+
+	// Stat Section
+public:
+	int32 GetLevel();
+	void SetLevel(int32 InNewLevel);
 };

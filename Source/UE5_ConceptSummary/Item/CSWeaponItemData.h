@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/CSItemData.h"
+#include "GameData/CSCharacterStat.h"
 #include "CSWeaponItemData.generated.h"
 
 /**
@@ -15,12 +16,13 @@ class UE5_CONCEPTSUMMARY_API UCSWeaponItemData : public UCSItemData
 	GENERATED_BODY()
 	
 public:
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+
+public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	//TObjectPtr<USkeletalMesh> WeaponMesh;
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
 
-	FPrimaryAssetId GetPrimaryAssetId() const override
-	{
-		return FPrimaryAssetId("CSItemData", GetFName());
-	}
+	UPROPERTY(EditAnywhere, Category = Stat)
+	FCSCharacterStat ModifierStat;
 };

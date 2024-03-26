@@ -9,13 +9,14 @@ UCSCharacterStatComponent::UCSCharacterStatComponent()
 {
 	CurrentLevel = 1;
 	AttackRadius = 50.0f;
+
+	// InitializeComponent() 함수 호출
+	bWantsInitializeComponent = true; 
 }
 
-
-// Called when the game starts
-void UCSCharacterStatComponent::BeginPlay()
+void UCSCharacterStatComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	SetLevelStat(CurrentLevel);
 	SetHp(BaseStat.MaxHp);
@@ -24,7 +25,7 @@ void UCSCharacterStatComponent::BeginPlay()
 void UCSCharacterStatComponent::SetLevelStat(int32 InNewLevel)
 {
 	CurrentLevel = FMath::Clamp(InNewLevel, 1, UCSGameSingleton::Get().CharacterMaxLevel);
-	BaseStat = UCSGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	SetBaseStat(UCSGameSingleton::Get().GetCharacterStat(CurrentLevel));
 	check(BaseStat.MaxHp > 0.0f);
 }
 

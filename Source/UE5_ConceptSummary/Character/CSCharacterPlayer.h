@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Character/CSCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/CSCharacterHUDInterface.h"
 #include "CSCharacterPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UE5_CONCEPTSUMMARY_API ACSCharacterPlayer : public ACSCharacterBase
+class UE5_CONCEPTSUMMARY_API ACSCharacterPlayer : public ACSCharacterBase, public ICSCharacterHUDInterface
 {
 	GENERATED_BODY()
 	
@@ -69,4 +70,8 @@ protected:
 	ECharacterControlType CurrentCharacterControlType;
 
 	void Attack();
+
+// UI Section
+protected:
+	virtual void SetupHUDWidget(class UCSHUDWidget* InHUDWidget) override;
 };

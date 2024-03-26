@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "CSCharacterControlData.h"
+#include "UI/CSHUDWidget.h"
+#include "CharacterStat/CSCharacterStatComponent.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
@@ -183,4 +185,16 @@ void ACSCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 void ACSCharacterPlayer::Attack()
 {
 	ProcessComboCommand();
+}
+
+void ACSCharacterPlayer::SetupHUDWidget(UCSHUDWidget* InHUDWidget)
+{
+	if (InHUDWidget)
+	{
+		InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+		InHUDWidget->UpdateHpBar(Stat->GetCurrentHp());
+
+		Stat->OnStatChanged.AddUObject(InHUDWidget, &UCSHUDWidget::UpdateStat);
+		Stat->OnHpChanged.AddUObject(InHUDWidget, &UCSHUDWidget::UpdateHpBar);
+	}
 }

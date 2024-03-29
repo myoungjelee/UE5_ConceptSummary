@@ -5,29 +5,24 @@
 #include "CoreMinimal.h"
 #include "Item/CSItemData.h"
 #include "GameData/CSCharacterStat.h"
-#include "CSWeaponItemData.generated.h"
+#include "CSScrollItemData.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class UE5_CONCEPTSUMMARY_API UCSWeaponItemData : public UCSItemData
+class UE5_CONCEPTSUMMARY_API UCSScrollItemData : public UCSItemData
 {
 	GENERATED_BODY()
-	
+
 public:
-	UCSWeaponItemData();
+	UCSScrollItemData();
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{
 		return FPrimaryAssetId("CSItemData", GetFName());
 	}
 
-public:
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	//TObjectPtr<USkeletalMesh> WeaponMesh;
-	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
-
 	UPROPERTY(EditAnywhere, Category = Stat)
-	FCSCharacterStat ModifierStat;
+	FCSCharacterStat BaseStat;
 };

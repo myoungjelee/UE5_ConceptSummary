@@ -18,7 +18,7 @@ public:
 	ACSAIController();
 
 	void RunAI();
-	void StopAi();
+	void StopAI();
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;

@@ -75,6 +75,23 @@ void ACSCharacterPlayer::BeginPlay()
 	//	
 	//}
 	SetCharacterControl(CurrentCharacterControlType);
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+	}
+}
+
+void ACSCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
 }
 
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

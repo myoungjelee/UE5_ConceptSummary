@@ -12,7 +12,7 @@
 #include "CharacterStat/CSCharacterStatComponent.h"
 #include "UI/CSWidgetComponent.h"
 #include "UI/CSHpBarWidget.h"
-#include "Item/CSWeaponItemData.h"
+#include "Item/CSItems.h"
 
 DEFINE_LOG_CATEGORY(LogCSCharacter);
 
@@ -115,6 +115,7 @@ void ACSCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	Stat->OnHpZero.AddUObject(this, &ACSCharacterBase::SetDead);
+	Stat->OnStatChanged.AddUObject(this, &ACSCharacterBase::ApplyStat);
 }
 
 void ACSCharacterBase::SetCharacterControlData(const UCSCharacterControlData* CharacterControlData)
@@ -267,9 +268,10 @@ void ACSCharacterBase::SetupCharacterWidget(UCSUserWidget* InUserWidget)
 	UCSHpBarWidget* HpBarWidget = Cast<UCSHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
+		HpBarWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UCSHpBarWidget::UpdateHpBar);
+		Stat->OnStatChanged.AddUObject(HpBarWidget, &UCSHpBarWidget::UpdateStat);
 	}
 }
 
@@ -284,13 +286,20 @@ void ACSCharacterBase::TakeItem(UCSItemData* InItemData)
 void ACSCharacterBase::DrinkPotion(UCSItemData* InItemData)
 {
 	UE_LOG(LogCSCharacter, Log, TEXT("Drink Potion"));
+
+	UCSPotionItemData* PotionItemData = Cast<UCSPotionItemData>(InItemData);
+	if (PotionItemData)
+	{
+		Stat->HealHp(PotionItemData->HealAmount);
+	}
+
 }
 
 void ACSCharacterBase::EquipWeapon(UCSItemData* InItemData)
 {
 	UE_LOG(LogCSCharacter, Log, TEXT("Equip Weapon"));
+	
 	UCSWeaponItemData* WeaponItemData = Cast<UCSWeaponItemData>(InItemData);
-
 	if (WeaponItemData)
 	{
 		//// Hard Ref
@@ -309,6 +318,12 @@ void ACSCharacterBase::EquipWeapon(UCSItemData* InItemData)
 void ACSCharacterBase::ReadScroll(UCSItemData* InItemData)
 {
 	UE_LOG(LogCSCharacter, Log, TEXT("Read Scroll"));
+
+	UCSScrollItemData* ScrollItemData = Cast<UCSScrollItemData>(InItemData);
+	if (ScrollItemData)
+	{
+		Stat->AddBaseStat(ScrollItemData->BaseStat);
+	}
 }
 
 int32 ACSCharacterBase::GetLevel()
@@ -319,6 +334,12 @@ int32 ACSCharacterBase::GetLevel()
 void ACSCharacterBase::SetLevel(int32 InNewLevel)
 {
 	Stat->SetLevelStat(InNewLevel);
+}
+
+void ACSCharacterBase::ApplyStat(const FCSCharacterStat& BaseStat, const FCSCharacterStat& ModifierStat)
+{
+	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 
 

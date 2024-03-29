@@ -13,8 +13,7 @@ UCSHUDWidget::UCSHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(
 void UCSHUDWidget::UpdateStat(const FCSCharacterStat& BaseStat, const FCSCharacterStat& ModifierStat)
 {
 	FCSCharacterStat TotalStat = BaseStat + ModifierStat;
-	HpBar->SetMaxHp(TotalStat.MaxHp);
-
+	HpBar->UpdateStat(BaseStat, ModifierStat);
 	CharacterStat->UpdateStat(BaseStat, ModifierStat);
 }
 

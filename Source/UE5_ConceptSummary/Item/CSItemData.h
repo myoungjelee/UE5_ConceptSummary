@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
 	EItemType Type;
 
-	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("CSItemData", GetFName());
+	}
 
 };

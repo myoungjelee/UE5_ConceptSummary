@@ -7,6 +7,7 @@
 #include "Interface/CSAnimationAttackInterface.h"
 #include "Interface/CSCharacterWidgetInterface.h"
 #include "Interface/CSCharacterItemInterface.h"
+#include "GameData/CSCharacterStat.h"
 #include "CSCharacterBase.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCSCharacter, Log, All);
@@ -86,6 +87,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCSCharacterStatComponent> Stat;
 
+public:
+	int32 GetLevel();
+	void SetLevel(int32 InNewLevel);
+	void ApplyStat(const FCSCharacterStat& BaseStat, const FCSCharacterStat& ModifierStat);
+
 	// UI Widget Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
@@ -105,10 +111,4 @@ protected:
 	virtual void DrinkPotion(class UCSItemData* InItemData);
 	virtual void EquipWeapon(class UCSItemData* InItemData);
 	virtual void ReadScroll(class UCSItemData* InItemData);
-
-
-	// Stat Section
-public:
-	int32 GetLevel();
-	void SetLevel(int32 InNewLevel);
 };

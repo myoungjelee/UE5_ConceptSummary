@@ -33,7 +33,7 @@ void ACSAIController::RunAI()
 	}
 }
 
-void ACSAIController::StopAi()
+void ACSAIController::StopAI()
 {
 	UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BTComponent)

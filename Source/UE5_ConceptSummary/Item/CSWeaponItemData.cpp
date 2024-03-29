@@ -3,10 +3,7 @@
 
 #include "Item/CSWeaponItemData.h"
 
-
-FPrimaryAssetId UCSWeaponItemData::GetPrimaryAssetId() const
+UCSWeaponItemData::UCSWeaponItemData()
 {
-    Super::GetPrimaryAssetId();
-
-    return FPrimaryAssetId("CSItemData", GetFName());
+	Type = EItemType::Weapon;
 }

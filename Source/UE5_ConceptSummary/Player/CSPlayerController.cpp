@@ -14,6 +14,21 @@ ACSPlayerController::ACSPlayerController()
 	}
 }
 
+void ACSPlayerController::GameScoreChanged(int32 NewScore)
+{
+	K2_OnScoreChanged(NewScore);
+}
+
+void ACSPlayerController::GameOver()
+{
+	K2_OnGameOver();
+}
+
+void ACSPlayerController::GameClear()
+{
+	K2_OnGameClear();
+}
+
 void ACSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

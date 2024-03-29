@@ -10,6 +10,7 @@
 #include "CSCharacterControlData.h"
 #include "UI/CSHUDWidget.h"
 #include "CharacterStat/CSCharacterStatComponent.h"
+#include "Interface/CSGameInterface.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
@@ -91,6 +92,12 @@ void ACSCharacterPlayer::SetDead()
 	if (PlayerController)
 	{
 		DisableInput(PlayerController);
+
+		ICSGameInterface* CSGameMode = Cast<ICSGameInterface>(GetWorld()->GetAuthGameMode());
+		if (CSGameMode)
+		{
+			CSGameMode->OnPlayerdDead();
+		}
 	}
 }
 

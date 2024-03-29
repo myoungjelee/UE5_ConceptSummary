@@ -16,6 +16,19 @@ class UE5_CONCEPTSUMMARY_API ACSPlayerController : public APlayerController
 	
 public:
 	ACSPlayerController();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnScoreChangedCpp"))
+	void K2_OnScoreChanged(int32 NewScore);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnGameOverCpp"))
+	void K2_OnGameOver();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnGameClearCpp"))
+	void K2_OnGameClear();
+
+	void GameScoreChanged(int32 NewScore);
+	void GameOver();
+	void GameClear();
 	
 protected:
 	virtual void BeginPlay() override;

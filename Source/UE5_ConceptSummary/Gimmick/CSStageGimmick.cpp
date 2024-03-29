@@ -7,6 +7,7 @@
 #include "Physics/CSCollision.h"
 #include "Character/CSCharacterNonPlayer.h"
 #include "Item/CSItemBox.h"
+#include "Interface/CSGameInterface.h"
 
 // Sets default values
 ACSStageGimmick::ACSStageGimmick()
@@ -186,6 +187,15 @@ void ACSStageGimmick::SetChooseNext()
 
 void ACSStageGimmick::OnEnemyDestroyed(AActor* DestroyedActor)
 {
+	ICSGameInterface* CSGameMode = Cast<ICSGameInterface>(GetWorld()->GetAuthGameMode());
+	if (CSGameMode)
+	{
+		CSGameMode->OnPlayerScoreChanged(CurrentStageNum);
+		if (CSGameMode->IsGameCleared())
+		{
+			return;
+		}
+	}
 	SetState(EStageState::REWARD);
 }
 

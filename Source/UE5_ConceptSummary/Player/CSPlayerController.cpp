@@ -3,7 +3,10 @@
 
 #include "Player/CSPlayerController.h"
 #include "UI/CSHUDWidget.h"
+#include "Player/CSSaveGame.h"
+#include "Kismet/GameplayStatics.h"
 
+DEFINE_LOG_CATEGORY(LogABPlayerController);
 
 ACSPlayerController::ACSPlayerController()
 {
@@ -22,6 +25,13 @@ void ACSPlayerController::GameScoreChanged(int32 NewScore)
 void ACSPlayerController::GameOver()
 {
 	K2_OnGameOver();
+
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
+	{
+		UE_LOG(LogABPlayerController, Error, TEXT("Save Game Error!"));
+	}
+
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
 }
 
 void ACSPlayerController::GameClear()
@@ -36,9 +46,13 @@ void ACSPlayerController::BeginPlay()
 	FInputModeGameOnly GameOnlyInputMode;
 	SetInputMode(GameOnlyInputMode);
 
-	CSHUDWidget = CreateWidget<UCSHUDWidget>(this, CSHUDWidgetClass);
-	if (CSHUDWidget)
+	SaveGameInstance = Cast<UCSSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"), 0));
+	if (!SaveGameInstance)
 	{
-		CSHUDWidget->AddToViewport();
+		SaveGameInstance = NewObject<UCSSaveGame>();
+		SaveGameInstance->RetryCount = 0;
 	}
+	SaveGameInstance->RetryCount++;
+
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
 }
